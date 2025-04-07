@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Preferences with Animations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s ease;
+            padding: 20px;
+        }
+        
+        .preference-panel {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+        }
+        
+        .animation-box {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+        
+        /* Animation classes */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .spin { animation: spin 1s linear infinite; }
+        .bounce { animation: bounce 0.5s ease infinite; }
+        .pulse { animation: pulse 1s ease infinite; }
+    </style>
+</head>
+<body>
+    <div class="preference-panel">
+        <h1>User Preferences</h1>
+        
+        <div>
+            <h3>Theme Color:</h3>
+            <button id="theme-light">Light</button>
+            <button id="theme-dark">Dark</button>
+            <button id="theme-blue">Blue</button>
+        </div>
+        
+        <div>
+            <h3>Animation Style:</h3>
+            <button id="animation-spin">Spin</button>
+            <button id="animation-bounce">Bounce</button>
+            <button id="animation-pulse">Pulse</button>
+            <button id="animation-none">None</button>
+        </div>
+        
+        <div class="animation-box" id="animation-box">
+            Box
+        </div>
+        
+        <button id="reset-preferences">Reset Preferences</button>
+    </div>
+
+    <script>
+        // DOM elements
+        const themeButtons = {
+            light: document.getElementById('theme-light'),
+            dark: document.getElementById('theme-dark'),
+            blue: document.getElementById('theme-blue')
+        };
+        
+        const animationButtons = {
+            spin: document.getElementById('animation-spin'),
+            bounce: document.getElementById('animation-bounce'),
+            pulse: document.getElementById('animation-pulse'),
+            none: document.getElementById('animation-none')
+        };
+        
+        const animationBox = document.getElementById('animation-box');
+        const resetButton = document.getElementById('reset-preferences');
+        
+        // Load preferences from localStorage
+        function loadPreferences() {
+            const preferences = JSON.parse(localStorage.getItem('userPreferences')) || {};
+            
+            // Apply theme
+            if (preferences.theme) {
+                applyTheme(preferences.theme);
+            }
+            
+            // Apply animation
+            if (preferences.animation) {
+                applyAnimation(preferences.animation);
+            }
+        }
+        
+        // Save preferences to localStorage
+        function savePreferences(key, value) {
+            const preferences = JSON.parse(localStorage.getItem('userPreferences')) || {};
+            preferences[key] = value;
+            localStorage.setItem('userPreferences', JSON.stringify(preferences));
+        }
+        
+        // Apply theme
+        function applyTheme(theme) {
+            document.body.className = ''; // Reset classes
+            document.body.classList.add(theme);
+            
+            // Highlight selected button
+            Object.values(themeButtons).forEach(btn => btn.classList.remove('active'));
+            if (themeButtons[theme]) {
+                themeButtons[theme].classList.add('active');
+            }
+        }
+        
+        // Apply animation
+        function applyAnimation(animation) {
+            // Remove all animation classes
+            animationBox.className = 'animation-box';
+            
+            if (animation !== 'none') {
+                animationBox.classList.add(animation);
+            }
+            
+            // Highlight selected button
+            Object.values(animationButtons).forEach(btn => btn.classList.remove('active'));
+            if (animationButtons[animation]) {
+                animationButtons[animation].classList.add('active');
+            }
+        }
+        
+        // Event listeners for theme buttons
+        themeButtons.light.addEventListener('click', () => {
+            applyTheme('light');
+            savePreferences('theme', 'light');
+        });
+        
+        themeButtons.dark.addEventListener('click', () => {
+            applyTheme('dark');
+            savePreferences('theme', 'dark');
+        });
+        
+        themeButtons.blue.addEventListener('click', () => {
+            applyTheme('blue');
+            savePreferences('theme', 'blue');
+        });
+        
+        // Event listeners for animation buttons
+        animationButtons.spin.addEventListener('click', () => {
+            applyAnimation('spin');
+            savePreferences('animation', 'spin');
+        });
+        
+        animationButtons.bounce.addEventListener('click', () => {
+            applyAnimation('bounce');
+            savePreferences('animation', 'bounce');
+        });
+        
+        animationButtons.pulse.addEventListener('click', () => {
+            applyAnimation('pulse');
+            savePreferences('animation', 'pulse');
+        });
+        
+        animationButtons.none.addEventListener('click', () => {
+            applyAnimation('none');
+            savePreferences('animation', 'none');
+        });
+        
+        // Reset button
+        resetButton.addEventListener('click', () => {
+            localStorage.removeItem('userPreferences');
+            applyTheme('');
+            applyAnimation('none');
+        });
+        
+        // Additional CSS for active buttons and themes
+        const style = document.createElement('style');
+        style.textContent = `
+            .active {
+                transform: scale(1.1);
+                box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            }
+            
+            .light { background-color: #f5f5f5; }
+            .dark { background-color: #333; color: white; }
+            .dark .preference-panel { background-color: #444; }
+            .blue { background-color: #e6f2ff; }
+        `;
+        document.head.appendChild(style);
+        
+        // Load preferences when page loads
+        window.addEventListener('DOMContentLoaded', loadPreferences);
+    </script>
+</body>
+</html>
